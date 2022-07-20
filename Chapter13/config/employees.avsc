@@ -1,0 +1,23 @@
+{
+  "type":"record",
+  "name":"employees",
+  "fields":[{
+     "name": "emp_no",
+     "type": "int"
+  }, {
+     "name": "name",
+     "type": "string"
+  }, {
+     "name": "department",
+     "type": "string"
+  },{
+     "name": "city",
+     "type": "string"
+  },{
+     "name": "salary",
+     "type": "int"
+  },{
+     "name": "record_creation_time",
+     "type": "float"
+  }
+]}
