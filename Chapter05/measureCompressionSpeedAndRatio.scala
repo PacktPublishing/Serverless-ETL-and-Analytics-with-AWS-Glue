@@ -145,7 +145,7 @@ class GlueMeasurement(spark: SparkSession, dstBucket: String, dstPath: String) {
  * Main part of this measurement.
  * Before running this script, set your bucket name and path where you want to put the TPC-DS data.
  * The measurement process runs as the following steps:
- * 1. Generate TPC-DS Parquet files without compression and write them in the specified S3 location
+ * 1. Generate TPC-DS dataset and write them as Parquet files without compression in the specified S3 location
  * 2. Measure compression and decompression speed by reading and writing the data
  * 3. Measure compression ratio between the Parquet files with compression and without compression
  */
