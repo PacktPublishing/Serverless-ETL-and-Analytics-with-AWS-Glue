@@ -1,0 +1,15 @@
+{
+    "Statement": [
+        {
+            "Action": [
+                "glue:StartCrawler",
+                "glue:GetCrawler"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "*"
+            ]
+        }
+    ],
+    "Version": "2012-10-17"
+}

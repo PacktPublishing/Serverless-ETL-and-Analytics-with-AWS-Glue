@@ -1,0 +1,10 @@
+{
+    "crawler_name": "ch10_2_example_workflow",
+    "etl_job_name": "ch10_2_example_workflow_gen_report",
+    "etl_job_args": {
+        "--datalake_location": "s3://<your-bucket-and-path>",
+        "--database": "<your-database>",
+        "--table": "example_workflow_sfn_sales",
+        "--report_year": "2021"
+    }
+}  

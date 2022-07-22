@@ -1,0 +1,144 @@
+Description: >
+  This template will deploy the Glue workflow which consists of Glue Crawler and two ETL Jobs.
+  The crawler populates a table based on sales-data.json.
+  The first job extracts the sales data and writes the data to the DataLakeLocation with category and report_year partitioning.
+  The other job generates a report based on the data that is processed by the first job.
+Parameters:
+  # Glue Crawler
+  GlueCrawlerRoleArn:
+    Description: >
+      IAM Role ARN for the Glue Crawler.
+    Type: String
+    Default: arn:aws:iam::<YOUR_ACCOUND_ID>:role/service-role/<ROLE_NAME>
+
+  # Glue Job - Common configuration
+  GlueJobRoleArn:
+    Description: >
+      IAM Role ARN for the Glue ETL jobs.
+    Type: String
+    Default: arn:aws:iam::<YOUR_ACCOUND_ID>:role/service-role/<ROLE_NAME>
+
+  # Glue Job - each script location
+  GlueJobScriptLocation:
+    Description: >
+      The combination of S3 bucket name and path that locates ch10_4_example_cf_partitioning.py and ch10_4_example_cf_gen_report.py.
+      The combination of this location and each script name is specified in each Glue job as its script location.
+      This location must end with a slash (/) and not include any files.
+    Type: String
+    Default: s3://<bucket-and-path-to-script>/
+    AllowedPattern: '^(s3://)(.*)(/)$'
+  
+  # Sales data
+  SalesDataLocation:
+    Description: >
+      The combination of S3 bucket name and path that stores sales-data.json that you downloaded from GitHub repository.
+      This location must end with a slash (/) and not include any files.
+    Type: String
+    Default: s3://<bucket-and-path-to-sales-data.json>/
+    AllowedPattern: '^(s3://)(.*)(/)$'
+  DataLakeLocation:
+    Description: >
+      The combination of S3 bucket name and path that stores the analytic sales data and a sales report.
+      This location must end with a slash (/) and not include any files.
+    Type: String
+    Default: s3://<bucket-and-path>/
+    AllowedPattern: '^(s3://)(.*)(/)$'
+  DatabaseName:
+    Description: >
+      Database name for the table of the sales data.
+    Type: String
+  TableName:
+    Description: >
+      Table name for the table of sales data. If you use a custom table name, set the table name here.
+    Type: String
+    Default: ch10_4_example_cf_sales
+  ReportYear:
+    Description: >
+      The year when you want to aggregate the dataset and generate a report.
+    Type: Number
+    Default: 2021
+
+Resources:
+  # Glue Crawler
+  SalesCrawler:
+    Type: 'AWS::Glue::Crawler'
+    Properties:
+      Name: ch10_4_example_cf_sales
+      Role: !Ref GlueCrawlerRoleArn
+      DatabaseName: !Ref DatabaseName
+      Targets:
+        S3Targets:
+          - Path: !Ref SalesDataLocation
+      TablePrefix: ch10_4_example_cf_
+      SchemaChangePolicy:
+        UpdateBehavior: UPDATE_IN_DATABASE
+        DeleteBehavior: DEPRECATE_IN_DATABASE
+
+  # Glue Jobs
+  PartitioningJob:
+    Type: 'AWS::Glue::Job'
+    Properties:
+      Name: ch10_4_example_cf_partitioning
+      Command:
+        Name: glueetl
+        ScriptLocation: !Join ['', [!Ref GlueJobScriptLocation, ch10_4_example_cf_partitioning.py]]
+        PythonVersion: 3
+      DefaultArguments:
+        '--enable-glue-datacatalog': ''
+        '--enable-continuous-cloudwatch-log': 'true'
+        '--enable-metrics': ''
+        '--job-language': python
+      MaxRetries: 0
+      GlueVersion: 3.0
+      Role: !Ref GlueJobRoleArn
+      WorkerType: G.1X
+      NumberOfWorkers: 3
+      Timeout: 2880
+      ExecutionProperty:
+        MaxConcurrentRuns: 1
+
+  GenReportJob:
+    Type: 'AWS::Glue::Job'
+    Properties:
+      Name: ch10_4_example_cf_gen_report
+      Command:
+        Name: glueetl
+        ScriptLocation: !Join ['', [!Ref GlueJobScriptLocation, ch10_4_example_cf_partitioning.py]]
+        PythonVersion: 3
+      DefaultArguments:
+        '--enable-glue-datacatalog': ''
+        '--enable-continuous-cloudwatch-log': 'true'
+        '--enable-metrics': ''
+        '--job-language': python
+      MaxRetries: 0
+      GlueVersion: 3.0
+      Role: !Ref GlueJobRoleArn
+      WorkerType: G.1X
+      NumberOfWorkers: 3
+      Timeout: 2880
+      ExecutionProperty:
+        MaxConcurrentRuns: 1
+  
+  # Workflow
+  SalesReportWorkflow:
+    Type: 'AWS::Glue::Workflow'
+    Properties:
+      DefaultRunProperties: {"datalake_location": !Ref DataLakeLocation}
+      Name: ch10_4_example_cf_workflow
+  
+  # Triggers
+  OndemandStartTrigger:
+    Type: AWS::Glue::Trigger
+    Properties:
+      Actions:
+        - CrawlerName: !Ref SalesCrawler
+      Name: ch10_4_example_cf_ondemand_start
+      Type: ON_DEMAND
+      WorkflowName: !Ref SalesReportWorkflow
+
+  #EventRunPartitioningTrigger:
+  #  Type: AWS::Glue::Trigger
+  #EventRunGenReportTrigger:
+  #  Type: AWS::Glue::Trigger
+
+

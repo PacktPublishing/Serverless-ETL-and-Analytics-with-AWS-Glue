@@ -1,0 +1,64 @@
+{
+    "Comment": "A workflow to run Glue Crawler and ETL Job",
+    "StartAt": "StartCrawler",
+    "States": {
+      "StartCrawler": {
+        "Type": "Task",
+        "Parameters": {
+          "Name.$": "$.crawler_name"
+        },
+        "Resource": "arn:aws:states:::aws-sdk:glue:startCrawler",
+        "Next": "WaitForCrawlerRun",
+        "ResultPath": null
+      },
+      "WaitForCrawlerRun": {
+        "Type": "Wait",
+        "Seconds": 20,
+        "Next": "GetCrawler"
+      },
+      "GetCrawler": {
+        "Type": "Task",
+        "Next": "isGlueCrawlerCompleted",
+        "Parameters": {
+          "Name.$": "$.crawler_name"
+        },
+        "Resource": "arn:aws:states:::aws-sdk:glue:getCrawler",
+        "ResultPath": "$.crawler",
+        "ResultSelector": {
+          "crawler_state.$": "$.Crawler.State"
+        }
+      },
+      "isGlueCrawlerCompleted": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "And": [
+              {
+                "Not": {
+                  "Variable": "$.crawler.crawler_state",
+                  "StringEquals": "READY"
+                }
+              },
+              {
+                "Not": {
+                  "Variable": "$.crawler.crawler_state",
+                  "StringEquals": "STOPPING"
+                }
+              }
+            ],
+            "Next": "WaitForCrawlerRun"
+          }
+        ],
+        "Default": "GlueStartJobRun"
+      },
+      "GlueStartJobRun": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::glue:startJobRun.sync",
+        "Parameters": {
+          "JobName.$": "$.etl_job_name",
+          "Arguments.$": "$.etl_job_args"
+        },
+        "End": true
+      }
+    }
+  }
