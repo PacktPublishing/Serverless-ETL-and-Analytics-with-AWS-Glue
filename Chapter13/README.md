@@ -1,12 +1,9 @@
-# Chapter 5: Data layouts
+# Chapter 13: Data analysis
 
-Here're the data and sample scripts that we used through this chapter:
-* `data.json`
-* `compression_by_dataframe.py`
-* `partitioning_by_dataframe.py`
-* `MeasureCompressionSpeedAndRatio.scala`
+Login to your AWS Console and paste the following to your browser address bar to create the CFn stack required to execute the code shipped with the chapter.
 
-## Appendix: Measuring compression speed and ratio with Glue Spark jobs
-You can measure compression speed and ratio by running `MeasureCompressionSpeedAndRatio.scala` on AWS Glue. Note that this approximately takes **6-7hours** for a 10-DPUs Glue Spark job.
+https://console.aws.amazon.com/cloudformation/home#/stacks/new?stackName=HandsonSeriesWithAWSGlueChapterDataAnalysis&templateURL=https://packt-serverless-etl-glue.s3.amazonaws.com/HandsonSeriesWithAWSGlue/HandsonSeriesWithAWSGlue.yaml
 
-Updating...
+#####
+
+**Note: While we have taken care to use minimum resources required for the execution of the code shipped with the chapter, please use your judgement to implement the CloudFormation template. Please delete the stack as soon as you have understood the concepts and please take care in changing the network setting of the CloudFormation to suit the needs of your organization. The CloudFormation template shipped with this chapter is built with a generic requirement in mind. These requirements might not align with the guidelines in your Organization. The reader bears the responsibility of issues resulting from the implementation of the CloudFormation template such as network and security compliance issues or cost implications of creating the CloudFormation stack.**
