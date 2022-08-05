@@ -1,6 +1,6 @@
 # 	Serverless ETL and Analytics with AWS Glue
 
-<a href="https://www.packtpub.com/product/serverless-etl-and-analytics-with-aws-glue/9781800564985?utm_source=github&utm_medium=repository&utm_campaign=9781800564985><img src="https://static.packt-cdn.com/products/9781800564985/cover/smaller" alt="Serverless ETL and Analytics with AWS Glue" height="256px" align="right"></a>
+<a href="https://www.packtpub.com/product/serverless-etl-and-analytics-with-aws-glue/9781800564985?utm_source=github&utm_medium=repository&utm_campaign=9781800564985"><img src="https://static.packt-cdn.com/products/9781800564985/cover/smaller" alt="Serverless ETL and Analytics with AWS Glue" height="256px" align="right"></a>
 
 This is the code repository for [Serverless ETL and Analytics with AWS Glue](https://www.packtpub.com/product/serverless-etl-and-analytics-with-aws-glue/9781800564985?utm_source=github&utm_medium=repository&utm_campaign=9781800564985), published by Packt.
 
