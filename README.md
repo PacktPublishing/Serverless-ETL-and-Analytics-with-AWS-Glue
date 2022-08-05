@@ -4,7 +4,7 @@
 
 This is the code repository for [Serverless ETL and Analytics with AWS Glue](https://www.packtpub.com/product/serverless-etl-and-analytics-with-aws-glue/9781800564985?utm_source=github&utm_medium=repository&utm_campaign=9781800564985), published by Packt.
 
-**Your comprehensive reference guide to learning about AWS Glue and its features*
+**Your comprehensive reference guide to learning about AWS Glue and its features**
 
 ## What is this book about?
 Organizations these days have gravitated toward services such as AWS Glue that undertake undifferentiated heavy lifting and provide serverless Spark, enabling you to create and manage data lakes in a serverless fashion. This guide shows you how AWS Glue can be used to solve real-world problems along with helping you learn about data processing, data integration, and building data lakes.
