@@ -36,7 +36,7 @@ root
 This artificial intelligence BI book is for data analysts and BI developers who want to explore advanced analytics or artificial intelligence possibilities with their data. 
 Prior knowledge of Power BI will help you get the most out of this book.
 
-With the following software and hardware list you can run all code files present in the book (Chapter 1-14).
+With the following software and hardware list you can run all code files present in the book (Chapter 1-15).
 
 ### Software and Hardware List
 
@@ -44,8 +44,8 @@ With the following software and hardware list you can run all code files present
 | -------- | ------------------------------------   | -----------------------------------|
 | 1-15	   | An AWS account                         | Windows, Mac OS X, and Linux (Any) |
 |     	   | The AWS CLI                            |                                    |
-|     	   | A web browser (Google Chrome, Mozilla  |                                    |
-| 	       | Firefox, Microsoft Edge, or Safari)    |                                    |
+|     	   | A web browser (Google Chrome, Mozilla                                       |
+| 	         Firefox, Microsoft Edge, or Safari)                                         |
 
 Not all the chapters' walkthroughs require an AWS CLI installation. You’ll be informed in each chapter when you need further requirements. 
 
