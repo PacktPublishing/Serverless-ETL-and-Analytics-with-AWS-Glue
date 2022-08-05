@@ -45,7 +45,7 @@ With the following software and hardware list you can run all code files present
 | 1-15	   | An AWS account                         | Windows, Mac OS X, and Linux (Any) |
 |     	   | The AWS CLI                            |                                    |
 |     	   | A web browser (Google Chrome, Mozilla                                       |
-| 	         Firefox, Microsoft Edge, or Safari)                                         |
+| 	       | Firefox, Microsoft Edge, or Safari)                                         |
 
 Not all the chapters' walkthroughs require an AWS CLI installation. You’ll be informed in each chapter when you need further requirements. 
 
