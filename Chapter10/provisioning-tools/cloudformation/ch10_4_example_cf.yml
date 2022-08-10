@@ -49,9 +49,11 @@ Parameters:
     Type: String
   TableName:
     Description: >
-      Table name for the table of sales data. If you use a custom table name, set the table name here.
+      Table name for the table of sales data that crawler creates. Set the last path name of your data lake location. 
+      (e.g.) If your data lake location is s3://bucket/path/datalakeloc/, set the table name "ch10_4_example_cf_datalakeloc". 
+      If you use "-" (hyphen) for you table name, replace "-" with "_" (underscore). You can also set a custom table name.
     Type: String
-    Default: ch10_4_example_cf_sales
+    Default: ch10_4_example_cf_<replace here with the last path name of your data lake location>
   ReportYear:
     Description: >
       The year when you want to aggregate the dataset and generate a report.
@@ -88,6 +90,7 @@ Resources:
         '--enable-continuous-cloudwatch-log': 'true'
         '--enable-metrics': ''
         '--job-language': python
+        '--extra-jars': 's3://crawler-public/json/serde/json-serde.jar'
       MaxRetries: 0
       GlueVersion: 3.0
       Role: !Ref GlueJobRoleArn
@@ -103,7 +106,7 @@ Resources:
       Name: ch10_4_example_cf_gen_report
       Command:
         Name: glueetl
-        ScriptLocation: !Join ['', [!Ref GlueJobScriptLocation, ch10_4_example_cf_partitioning.py]]
+        ScriptLocation: !Join ['', [!Ref GlueJobScriptLocation, ch10_4_example_cf_gen_report.py]]
         PythonVersion: 3
       DefaultArguments:
         '--enable-glue-datacatalog': ''
@@ -123,7 +126,7 @@ Resources:
   SalesReportWorkflow:
     Type: 'AWS::Glue::Workflow'
     Properties:
-      DefaultRunProperties: {"datalake_location": !Ref DataLakeLocation}
+      DefaultRunProperties: {"datalake_location": !Ref DataLakeLocation, "database": !Ref DatabaseName, "table": !Ref TableName, "report_year": !Ref ReportYear}
       Name: ch10_4_example_cf_workflow
   
   # Triggers
@@ -136,9 +139,34 @@ Resources:
       Type: ON_DEMAND
       WorkflowName: !Ref SalesReportWorkflow
 
-  #EventRunPartitioningTrigger:
-  #  Type: AWS::Glue::Trigger
-  #EventRunGenReportTrigger:
-  #  Type: AWS::Glue::Trigger
+  EventRunPartitioningTrigger:
+    Type: AWS::Glue::Trigger
+    Properties:
+      Actions: 
+        - JobName: !Ref PartitioningJob
+      Name: ch10_4_example_cf_event_run_partitioning
+      Type: CONDITIONAL
+      Predicate:
+        Conditions:
+          - LogicalOperator: EQUALS
+            CrawlerName: !Ref SalesCrawler
+            CrawlState: SUCCEEDED
+      StartOnCreation: true
+      WorkflowName: !Ref SalesReportWorkflow
+  
+  EventRunGenReportTrigger:
+    Type: AWS::Glue::Trigger
+    Properties:
+      Actions:
+        - JobName: !Ref GenReportJob
+      Name: ch10_4_example_cf_event_gen_report
+      Type: CONDITIONAL
+      Predicate:
+        Conditions:
+          - LogicalOperator: EQUALS
+            JobName: !Ref PartitioningJob
+            State: SUCCEEDED
+      StartOnCreation: true
+      WorkflowName: !Ref SalesReportWorkflow
 
 

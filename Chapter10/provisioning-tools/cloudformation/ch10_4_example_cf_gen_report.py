@@ -1,4 +1,3 @@
-# ch10_1_example_workflow_2_gen_report
 import sys
 import boto3
 from pyspark.context import SparkContext
