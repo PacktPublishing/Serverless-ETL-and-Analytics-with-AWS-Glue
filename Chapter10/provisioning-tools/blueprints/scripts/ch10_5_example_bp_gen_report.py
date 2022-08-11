@@ -49,7 +49,7 @@ if __name__ == '__main__':
     # Create/update a report table
     sink = glue_context.getSink(
         connection_type="s3",
-        path=f"{DATALAKE_LOCATION}/serverless-etl-and-analysis-w-glue/chapter10/example-cf/report/",
+        path=f"{DATALAKE_LOCATION}/serverless-etl-and-analysis-w-glue/chapter10/example-bp/report/",
         enableUpdateCatalog=True,
         updateBehavior="UPDATE_IN_DATABASE",
         partitionKeys=["report_year"])

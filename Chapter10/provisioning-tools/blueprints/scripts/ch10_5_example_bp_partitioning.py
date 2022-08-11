@@ -27,7 +27,7 @@ DATABASE = get_workflow_props(client=glue, prop_name="database", args=args)
 TABLE = get_workflow_props(client=glue, prop_name="table", args=args)
 TABLE_ANALYSIS = TABLE + '_analysis'
 '''
-NOTE: The following parameters are used in the next Glue job; ch10_4_example_cf_gen_report
+NOTE: The following parameters are used in the next Glue job; ch10_5_example_bp_gen_report
 # TABLE_REPORT = TABLE + '_report'
 # REPORT_YEAR = get_workflow_props(client=glue, prop_name="report_year", args=args)
 '''
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     # Create/update a table for sales analysis that is partitioned by category and report year 
     sink = glue_context.getSink(
         connection_type="s3",
-        path=f"{DATALAKE_LOCATION}/serverless-etl-and-analysis-w-glue/chapter10/example-cf/data/",
+        path=f"{DATALAKE_LOCATION}/serverless-etl-and-analysis-w-glue/chapter10/example-bp/data/",
         enableUpdateCatalog=True,
         updateBehavior="UPDATE_IN_DATABASE",
         partitionKeys=["category", "report_year"])
