@@ -51,7 +51,7 @@ Parameters:
     Description: >
       Table name for the table of sales data that crawler creates. You can also set a custom table name. 
       If you set a custom table name, note that keep the table name starting from "ch10_4_example_cf_" and ending with "sales" (or the last s3 path of your data lake location)
-      For example, if you set a table prefix name as "ch10_4_example_cf_custom_" and set a data lake location as "s3://bucket/path/datalakeloc/"", set the table name as "ch10_4_example_cf_custom_datalakeloc". 
+      For example, if you set a table prefix name as "ch10_4_example_cf_custom_" and set a data lake location as "s3://bucket/path/datalakeloc/", set the table name as "ch10_4_example_cf_custom_datalakeloc". 
       And, if you use "-" (hyphen) for you table name, replace "-" with "_" (underscore). 
     Type: String
     Default: ch10_4_example_cf_sales
