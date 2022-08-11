@@ -25,7 +25,6 @@ dag = DAG(
 glue_crawler_sales = AwsGlueCrawlerOperator(
     task_id="sales_crawl",
     config={"Name": "ch10_3_example_workflow"},
-    poll_interval=15,
     dag=dag)
 
 glue_job_gen_report = AwsGlueJobOperator(  
@@ -34,9 +33,10 @@ glue_job_gen_report = AwsGlueJobOperator(
     script_args={
         "--datalake_location": "s3://<your-bucket-and-path>",
         "--database": "<your-database>",
-        "--table": "example_workflow_mwaa_parquet",
-        "--report_year": "2021"
+        "--table": "example_workflow_mwaa_sales",
+        "--report_year": "2021",
+        "--extra-jars": "s3://crawler-public/json/serde/json-serde.jar"
         },
-    dag=dag) 
-#     iam_role_name='<Your Glue Job IAM Role name>',  
+    dag=dag)
+
 glue_crawler_sales >> glue_job_gen_report
