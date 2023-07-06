@@ -59,7 +59,7 @@ def generate_layout(user_params, system_params):
             '--enable-metrics': '',
             '--job-language': 'python',
             '--extra-jars': 's3://crawler-public/json/serde/json-serde.jar'},
-        GlueVersion="3.0",
+        GlueVersion="4.0",
         DependsOn={sales_crawler: "SUCCEEDED"})
 
     # gen_report_job
@@ -77,7 +77,7 @@ def generate_layout(user_params, system_params):
             '--enable-continuous-cloudwatch-log': 'true',
             '--enable-metrics': '',
             '--job-language': 'python'},
-        GlueVersion="3.0",
+        GlueVersion="4.0",
         DependsOn={partitioning_job: "SUCCEEDED"}
     )
 

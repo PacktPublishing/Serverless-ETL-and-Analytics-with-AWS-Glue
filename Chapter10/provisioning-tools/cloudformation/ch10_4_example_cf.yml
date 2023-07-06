@@ -93,7 +93,7 @@ Resources:
         '--job-language': python
         '--extra-jars': 's3://crawler-public/json/serde/json-serde.jar'
       MaxRetries: 0
-      GlueVersion: 3.0
+      GlueVersion: 4.0
       Role: !Ref GlueJobRoleArn
       WorkerType: G.1X
       NumberOfWorkers: 3
@@ -115,7 +115,7 @@ Resources:
         '--enable-metrics': ''
         '--job-language': python
       MaxRetries: 0
-      GlueVersion: 3.0
+      GlueVersion: 4.0
       Role: !Ref GlueJobRoleArn
       WorkerType: G.1X
       NumberOfWorkers: 3
