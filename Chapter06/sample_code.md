@@ -431,56 +431,136 @@ spark.sql("SELECT product_name,category,price,customer_name,email,phone,purchase
 
 - Run the following code on AWS Glue
 ```
-from pyspark.sql.functions import regexp_replace
-df_masked = df_destination.withColumn("phone", regexp_replace("phone", r'(\d)', '*'))
+df_masked = df_destination.withColumn("phone", lit("*"))
 df_masked.select('product_name','category','price','customer_name','email','phone','purchased_at').show()
 ```
 
 - Run the following code on AWS Glue
 ```
-entities_filter = [] # Empty list means we detect all entities.
-sample_fraction = 1.0 # 100% 
-threshold_fraction = 0.8 # At least 80% of rows for a given column should contain the same entity in order for the column to be classified as that entity.
-transformation_ctx = ""
-stage_threshold = 0
-total_threshold = 0
+from awsglueml.transforms import EntityDetector
 
-recognizer = EntityRecognizer()
-results = recognizer.classify_columns(frame=dyf, entities_filter=entities_filter, sample_fraction=sample_fraction, threshold_fraction=threshold_fraction, stageThreshold=stage_threshold, totalThreshold=total_threshold)
+entity_detector = EntityDetector()
+classified_map = entity_detector.classify_columns(
+    dyf,
+    [
+        "PERSON_NAME",
+        "EMAIL",
+        "CREDIT_CARD",
+        "IP_ADDRESS",
+        "MAC_ADDRESS",
+        "PHONE_NUMBER",
+        "USA_PASSPORT_NUMBER",
+        "USA_SSN",
+        "USA_ITIN",
+        "BANK_ACCOUNT",
+        "USA_DRIVING_LICENSE",
+        "USA_HCPCS_CODE",
+        "USA_NATIONAL_DRUG_CODE",
+        "USA_NATIONAL_PROVIDER_IDENTIFIER",
+        "USA_DEA_NUMBER",
+        "USA_HEALTH_INSURANCE_CLAIM_NUMBER",
+        "USA_MEDICARE_BENEFICIARY_IDENTIFIER",
+        "JAPAN_BANK_ACCOUNT",
+        "JAPAN_DRIVING_LICENSE",
+        "JAPAN_MY_NUMBER",
+        "JAPAN_PASSPORT_NUMBER",
+        "UK_BANK_ACCOUNT",
+        "UK_BANK_SORT_CODE",
+        "UK_DRIVING_LICENSE",
+        "UK_ELECTORAL_ROLL_NUMBER",
+        "UK_NATIONAL_HEALTH_SERVICE_NUMBER",
+        "UK_NATIONAL_INSURANCE_NUMBER",
+        "UK_PASSPORT_NUMBER",
+        "UK_PHONE_NUMBER",
+        "UK_UNIQUE_TAXPAYER_REFERENCE_NUMBER",
+        "UK_VALUE_ADDED_TAX",
+    ],
+    1.0,
+    0.1,
+)
 
-for key in results:
-    for recognized_value in results[key]:
-        # Mask CREDIT_CARD, PHONE_NUMBER and IP_ADDRESS columns
-        if recognized_value in ["CREDIT_CARD", "PHONE_NUMBER", "IP_ADDRESS"]:
-            df = df.withColumn(key, regexp_replace(key, r'(\d)', '*'))
+def maskDf(df, keys):
+    if not keys:
+        return df
+    df_to_mask = df.toDF()
+    for key in keys:
+        df_to_mask = df_to_mask.withColumn(key, lit("*"))
+    return DynamicFrame.fromDF(df_to_mask, glueContext, "updated_masked_df")
+
+dyf = maskDf(dyf, list(classified_map.keys()))
 ```
 
 ### Hashing values
 
 - Run the following code on AWS Glue
 ```
-from pyspark.sql.functions import sha2
-df_hashed = df_masked.withColumn("email", sha2("email", 256))
+def pii_column_hash(original_cell_value):
+    return hashlib.sha256(original_cell_value.encode()).hexdigest()
+
+pii_column_hash_udf = udf(pii_column_hash, StringType())
+
+df_hashed = df_masked.withColumn("email", pii_column_hash_udf("email"))
 df_hashed.select('product_name','category','price','customer_name','email','phone','purchased_at').show()
 ```
 
 - Run the following code on AWS Glue
 ```
-entities_filter = [] # Empty list means we detect all entities.
-sample_fraction = 1.0 # 100% 
-threshold_fraction = 0.8 # At least 80% of rows for a given column should contain the same entity in order for the column to be classified as that entity.
-transformation_ctx = ""
-stage_threshold = 0 
-total_threshold = 0
+from awsglueml.transforms import EntityDetector
 
-recognizer = EntityRecognizer()
-results = recognizer.classify_columns(frame=dyf, entities_filter=entities_filter, sample_fraction=sample_fraction, threshold_fraction=threshold_fraction, stageThreshold=stage_threshold, totalThreshold=total_threshold)
+entity_detector = EntityDetector()
+classified_map = entity_detector.classify_columns(
+    dyf,
+    [
+        "PERSON_NAME",
+        "EMAIL",
+        "CREDIT_CARD",
+        "IP_ADDRESS",
+        "MAC_ADDRESS",
+        "PHONE_NUMBER",
+        "USA_PASSPORT_NUMBER",
+        "USA_SSN",
+        "USA_ITIN",
+        "BANK_ACCOUNT",
+        "USA_DRIVING_LICENSE",
+        "USA_HCPCS_CODE",
+        "USA_NATIONAL_DRUG_CODE",
+        "USA_NATIONAL_PROVIDER_IDENTIFIER",
+        "USA_DEA_NUMBER",
+        "USA_HEALTH_INSURANCE_CLAIM_NUMBER",
+        "USA_MEDICARE_BENEFICIARY_IDENTIFIER",
+        "JAPAN_BANK_ACCOUNT",
+        "JAPAN_DRIVING_LICENSE",
+        "JAPAN_MY_NUMBER",
+        "JAPAN_PASSPORT_NUMBER",
+        "UK_BANK_ACCOUNT",
+        "UK_BANK_SORT_CODE",
+        "UK_DRIVING_LICENSE",
+        "UK_ELECTORAL_ROLL_NUMBER",
+        "UK_NATIONAL_HEALTH_SERVICE_NUMBER",
+        "UK_NATIONAL_INSURANCE_NUMBER",
+        "UK_PASSPORT_NUMBER",
+        "UK_PHONE_NUMBER",
+        "UK_UNIQUE_TAXPAYER_REFERENCE_NUMBER",
+        "UK_VALUE_ADDED_TAX",
+    ],
+    1.0,
+    0.1,
+)
 
-for key in results:
-    for recognized_value in results[key]:
-        # Hash DRIVING_LICENSE, PASSPORT_NUMBER, and USA_ITIN columns using SHA-2
-        if recognized_value in ["DRIVING_LICENSE", "PASSPORT_NUMBER", "USA_ITIN"]:
-            df = df.withColumn(key, sha2(key, 256))
+def pii_column_hash(original_cell_value):
+    return hashlib.sha256(original_cell_value.encode()).hexdigest()
+
+pii_column_hash_udf = udf(pii_column_hash, StringType())
+
+def hashDf(df, keys):
+    if not keys:
+        return df
+    df_to_hash = df.toDF()
+    for key in keys:
+        df_to_hash = df_to_hash.withColumn(key, pii_column_hash_udf(key))
+    return DynamicFrame.fromDF(df_to_hash, glueContext, "updated_hashed_df")
+
+dyf = hashDf(dyf, list(classified_map.keys()))
 ```
 
 ## Managing data quality
